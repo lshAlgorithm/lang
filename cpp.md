@@ -70,4 +70,4 @@ int main() {
     * `void*`: For type agnosticism and flexibility that void* provides in C++
 2. 类继承中虚函数的机制关键在于虚函数表，[More](https://csguide.cn/cpp/object_oriented/virtual_function.html#%E5%8A%A8%E6%80%81%E5%A4%9A%E6%80%81%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86)
 3. `*` is dereference(return the value of the address), `&` is reference(return the address of the data)
-> This is the same with Rust.
+    > This is the same with Rust.

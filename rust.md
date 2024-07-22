@@ -248,6 +248,32 @@ fn main() -> Result<(), Box<dyn Error>> {
   * `Arc<Mutex<Foo>>`: Allow multiple smart pointers the ability to lock temporary mutable/immutable borrows in a CPU thread exclusive manner.
 ## Rust container cheat sheet
 ![](https://rcore-os.cn/rCore-Tutorial-Book-v3/_images/rust-containers.png)
+
+# Project organization
+* `std` is the **crate** of the standard library of Rust which is full of useful data structures and functions for interacting with your **operating system**.
+* a module `foo` can be represented as:
+    * a file named `foo.rs`
+    * a directory named foo with a file `mod.rs`(module) inside
+* Hierarchy:
+  * `mod foo` will look for `foo.rs` or `foo/mod.rs`
+  * Inside `mod.rs` you can also use `mod foo_son`
+  * Then you can `use foo_son::{...}`, to import your functions
+  * keyword `use`:
+    * crate - the root module of your crate (e.g.`use crate::sbi::shutdown`, stand for something written or   `pub use` by the `main.rs` or `lib.rs`, i.e. the *root module*)
+    * super - the parent module of your current module
+    * self - the current module
+
+* `unit test`:
+```rs
+#[cfg(test)]
+mod tests {
+    // Notice that we don't immediately get access to the 
+    // parent module. We must be explicit.
+    use super::*;
+
+    ... tests go here ...
+}
+```
 # Graph
 > Anology to cpp
 ```cpp
@@ -329,6 +355,7 @@ impl<R: io::BufRead> Scanner<R> {
     }
 }
 ```
+# Common `std`
 1. `vector`:
 ```rs
 let pile: Vec<_> = (0..n).map(|_| scan.token::<usize>()).collect();
@@ -338,3 +365,8 @@ let mut t: Vec<i32> = vec![];
 ```rs
 let p: Vec<u8> = scan.token::<String>().bytes().collect();
 ```
+3. `filter()` use to **judge** if the element is true or not
+   * e.g. `numbers.iter().filter(|&x| x % 2 == 0)` or `for special in (0..=m_cows).filter(|&i| r[i] > 0) {...}`
+   * You need `&` to get a refer of the value, ensuring no modification of value
+4. `map()` **map** an element to another element
+   * e.g. `numbers.iter().map(|x| x * 2).collect::<Vec<_>>();`
