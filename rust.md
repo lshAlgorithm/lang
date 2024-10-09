@@ -246,6 +246,32 @@ fn main() -> Result<(), Box<dyn Error>> {
   * `Rc<Vec<Foo>>`: allow **clone** many pointers that can borrow the same vector of **immutable** data structures on the **heap**.
   * `Rc<RefCell<Foo>>`: Allow multiple smart pointers the ability to **borrow** mutably/immutably the same struct
   * `Arc<Mutex<Foo>>`: Allow multiple smart pointers the ability to lock temporary mutable/immutable borrows in a CPU thread exclusive manner.
+
+* Example:
+```rs
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let shared_data = Arc::new(Mutex::new(vec![1, 2, 3]));
+
+    let cloned_data = Arc::clone(&shared_data);
+
+    thread::spawn(move || { // move, so you cannot access the data in cloned_data after this function
+        let mut data = cloned_data.lock().unwrap();
+        data.push(4);
+    }).join().unwrap();
+
+    println!("Final data: {:?}", shared_data.lock().unwrap()); // [1, 2, 3, 4]
+}
+```
+  1. `cloned data` refers to the address in the heap which is stored as Mutex, use it just as a `Mutex`
+  2. `lock()` 会阻塞直到它获得锁，如果锁已经被其他线程持有，那么调用线程就会等待
+  3. `unwrap()`用来处理可能的错误
+  4. `spawn()` pass a closure as an argument, Rust will execute it in a new thread as child thread
+> Note that thread::spawn() returns immediately with a JoinHandle type without waiting for the child thread to finish its task. This means the main thread continues to run while the child thread executes asynchronously.
+> But, CAN IT JUST OMIT THE CHILD THREAD?
+  5. `join()` == `JoinHandle::join()` called explicitly to wait for the child thread to complete. The main thread therefore get **blocked** until the child thread finish
 ## Rust container cheat sheet
 ![](https://rcore-os.cn/rCore-Tutorial-Book-v3/_images/rust-containers.png)
 
@@ -370,3 +396,5 @@ let p: Vec<u8> = scan.token::<String>().bytes().collect();
    * You need `&` to get a refer of the value, ensuring no modification of value
 4. `map()` **map** an element to another element
    * e.g. `numbers.iter().map(|x| x * 2).collect::<Vec<_>>();`
+5. `drain()`
+6. `find()`
